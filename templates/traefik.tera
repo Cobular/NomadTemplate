@@ -1,0 +1,45 @@
+{% macro public(service_name, subdomain=-1, domain="cobular.com") -%}
+{% if subdomain == -1 -%}
+    {% set subdomain = service_name -%}
+{% endif -%}
+tags = [
+    "traefik.enable=true",
+    "traefik.http.middlewares.{{ service_name }}-mid.headers.customresponseheaders.X-Job={{ service_name }}",
+    "traefik.http.middlewares.{{ service_name }}-mid.headers.customresponseheaders.X-Task={{ service_name }}",
+    "traefik.http.middlewares.{{ service_name }}-mid.headers.customresponseheaders.X-Service=http",
+    "traefik.http.routers.{{ service_name }}.rule=Host(`{{ subdomain }}.{{ domain }}`)",
+    "traefik.http.services.{{ service_name }}.loadbalancer.sticky=true",
+    "traefik.tags=service",
+    "traefik.frontend.rule=Host:{{ subdomain }}.{{ domain }}",
+    "traefik.http.routers.{{ service_name }}.middlewares={{ service_name }}-mid",
+    "traefik.http.routers.{{ service_name }}.entrypoints=https",
+    "traefik.http.routers.{{ service_name }}.tls.certresolver=certResolver",
+    "traefik.http.routers.{{ service_name }}-http.entrypoints=http",
+    "traefik.http.routers.{{ service_name }}-http.rule=Host(`{{ subdomain }}.{{ domain }}`)",
+    "traefik.http.routers.{{ service_name }}-http.middlewares=redirect-to-https@file"
+]
+{% endmacro public %}
+
+{% macro private(service_name, subdomain=-1, domain="cobular.com") -%}
+{% if subdomain == -1 -%}
+    {% set subdomain = service_name -%}
+{% endif -%}
+tags = [
+    "traefik.enable=true",
+    "traefik.http.middlewares.{{ service_name }}-mid.headers.customresponseheaders.X-Job={{ service_name }}",
+    "traefik.http.middlewares.{{ service_name }}-mid.headers.customresponseheaders.X-Task={{ service_name }}",
+    "traefik.http.middlewares.{{ service_name }}-mid.headers.customresponseheaders.X-Service=http",
+    "traefik.http.routers.{{ service_name }}.rule=Host(`{{ subdomain }}.{{ domain }}`)",
+    "traefik.http.services.{{ service_name }}.loadbalancer.sticky=true",
+    "traefik.tags=service",
+    "traefik.frontend.rule=Host:{{ subdomain }}.{{ domain }}",
+    "traefik.http.routers.{{ service_name }}.middlewares={{ service_name }}-chain",
+    "traefik.http.middlewares.{{ service_name }}-chain.chain.middlewares={{ service_name }}-mid,local-ipwhitelist@file",
+    "traefik.http.routers.{{ service_name }}.entrypoints=https",
+    "traefik.http.routers.{{ service_name }}.tls.certresolver=certResolver",
+    "traefik.http.routers.{{ service_name }}-http.entrypoints=http",
+    "traefik.http.routers.{{ service_name }}-http.rule=Host(`{{ subdomain }}.{{ domain }}`)",
+    "traefik.http.middlewares.{{ service_name }}-chain-http.chain.middlewares=redirect-to-https@file,local-ipwhitelist@file",
+    "traefik.http.routers.{{ service_name }}-http.middlewares={{ service_name }}-chain-http"
+]
+{% endmacro private %}

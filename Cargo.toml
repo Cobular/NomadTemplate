@@ -1,0 +1,18 @@
+[package]
+name = "nomad_template"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+anyhow = { version = "1.0.72", features = ["backtrace"] }
+clap = { version = "4.3.21", features = ["derive"] }
+glob = "0.3.1"
+serde = { version = "1.0.183", features = ["derive"] }
+toml = "0.7.6"
+tera = { version = "1", default-features = false }
+log = "0.4.20"
+env_logger = "0.10.0"
+clap-verbosity-flag = "2.0.1"
+itertools = "0.11.0"
